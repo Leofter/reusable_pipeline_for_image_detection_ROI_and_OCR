@@ -1,0 +1,1 @@
+# Pipeline for image detection, crop and OCR based on image annotation.
