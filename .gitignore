@@ -1,0 +1,6 @@
+.env 
+
+ignore/*
+!ignore/.gitkeep
+
+.vscode
