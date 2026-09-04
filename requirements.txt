@@ -1,0 +1,10 @@
+
+opencv 
+
+transformers
+
+pillow
+
+torch
+
+ultralytics
