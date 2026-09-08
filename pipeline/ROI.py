@@ -1,13 +1,27 @@
+from abc import ABC, abstractmethod, abstractclassmethod
 import cv2
+from .detection import *
 
-class Roi:
 
-    def __init__(self, detection):
-        self.detection = detection
+class Roi(ABC):
 
-    def roi_result(self):
-        image = cv2.imread(self.detection.image)
-        results = self.detection.model_result()
+    def __init__(self, image, xyxy):
+        self.image = image
+        self.xyxy = xyxy
+
+    @abstractmethod
+    def crop(self):
+        pass
+
+
+class Crop(Roi):
+
+    def __init__(self, image, xyxy):
+        super().__init__(image, xyxy)
+
+    def crop(self):
+        image = cv2.imread(self.image)
+        results = xyxy
 
         for result in results:
             for box in result.boxes:
@@ -19,7 +33,6 @@ class Roi:
 
                 return self.roi_image
 
-    def show_roi(self):
 
-        cv2.imshow("ROI image", self.roi_image)
-        cv2.waitKey(0)
+def apply_roi(roi: Roi, image: str, xyxy):
+    return Roi.crop(image, xyxy)

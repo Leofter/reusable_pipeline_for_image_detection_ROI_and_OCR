@@ -4,9 +4,6 @@ from ultralytics import YOLO
 
 class Detection(ABC):
 
-    def __init__(self, model: str):
-        self.model = model
-
     @abstractmethod
     def model_result(self):
         pass
@@ -14,18 +11,13 @@ class Detection(ABC):
 
 class YoloDetection(Detection):
 
-    def __init__(self, model, image_path: str):
-        super().__init__(model)
-        self.image_path = image_path
+    def model_result(self, model: str, image_path: str, conf: float):
 
-    def model_result(self, conf: float):
-        self.conf = conf
-
-        model = YOLO(self.model)
+        model = YOLO(model)
 
         results = model.predict(
-            source=self.image_path,  # Path to your test or validation images
-            conf=self.conf,
+            source=image_path,  # Path to your test or validation images
+            conf=conf,
         )
 
         for result in results:
@@ -33,3 +25,7 @@ class YoloDetection(Detection):
             # top-left-x, top-left-y, bottom-right-x, bottom-right-y
 
         return xyxy
+
+
+def apply_detection(detection: Detection, model: str, image: str):
+    return detection.model_result()
