@@ -23,7 +23,7 @@ class Crop(Roi):
         image = cv2.imread(self.image)
 
         for box in self.xyxy:
-            xyxy = box.cpu().numpy().astype(int)
+            xyxy = box.astype(int)
             xmin, ymin, xmax, ymax = xyxy
 
             self.roi_image = image[ymin:ymax, xmin:xmax]
