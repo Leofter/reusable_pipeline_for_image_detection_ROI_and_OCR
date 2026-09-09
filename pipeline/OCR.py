@@ -13,7 +13,7 @@ class OcrInference(ABC):
 class PaddleOCR(OcrInference):
 
     def __init__(self, model):
-        self.model = TextRecognition(model)
+        self.model = TextRecognition(model_name=model)
 
     def predict(self, image, output_dir: str):
         output = self.model.predict(input=image, batch_size=1)
