@@ -5,31 +5,25 @@ from paddleocr import TextRecognition
 
 class OcrInference(ABC):
 
-    def __init__(self, image, output_dir: str):
-        self.image = image
-        self.output_dir = output_dir
-
     @abstractmethod
-    def ocr_exec(self):
+    def predict(self, image, output_dir: str):
         pass
 
 
 class PaddleOCR(OcrInference):
 
-    def __init__(self, model, image, output_dir):
-        super().__init__(image, output_dir)
-        self.model = model
+    def __init__(self, model):
+        self.model = TextRecognition(model)
 
-    def ocr_exec(self):
-        model = TextRecognition(model_name=self.model)
-        output = model.predict(input=self.image, batch_size=1)
+    def predict(self, image, output_dir: str):
+        output = self.model.predict(input=image, batch_size=1)
 
         for res in output:
             res.print()
-            res.save_to_json(save_path=self.output_dir + "/res.json")
+            res.save_to_json(save_path=output_dir + "/res.json")
 
         return output
 
 
-def apply_ocr(ocr: OcrInference, model: str, image: str, output_dir: str) -> None:
-    return ocr(model, image, output_dir).ocr_exec()
+def apply_ocr(ocr: OcrInference, image, output_dir: str):
+    return ocr.predict(image, output_dir)
