@@ -32,4 +32,4 @@ class PaddleOCR(OcrInference):
 
 
 def apply_ocr(ocr: OcrInference, model: str, image: str, output_dir: str) -> None:
-    return OcrInference.ocr_exec(model, image, output_dir)
+    return ocr(model, image, output_dir).ocr_exec()

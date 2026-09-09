@@ -21,18 +21,15 @@ class Crop(Roi):
 
     def crop(self):
         image = cv2.imread(self.image)
-        results = xyxy
 
-        for result in results:
-            for box in result.boxes:
+        for box in self.xyxy:
+            xyxy = box.cpu().numpy().astype(int)
+            xmin, ymin, xmax, ymax = xyxy
 
-                xyxy = box.xyxy[0].cpu().numpy().astype(int)
-                xmin, ymin, xmax, ymax = xyxy
+            self.roi_image = image[ymin:ymax, xmin:xmax]
 
-                self.roi_image = image[ymin:ymax, xmin:xmax]
-
-                return self.roi_image
+            return self.roi_image
 
 
 def apply_roi(roi: Roi, image: str, xyxy):
-    return Roi.crop(image, xyxy)
+    return roi(image, xyxy).crop()

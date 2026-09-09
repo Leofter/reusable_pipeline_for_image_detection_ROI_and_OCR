@@ -13,13 +13,14 @@ load_dotenv()
 # CONFIG YOLO
 yolo_model = os.getenv("YOLO_MODEL")
 image_path = os.getenv("IMAGE_PATH")
+conf = 0.5
 
 # CONFIG OCR
 ocr_model = "PP-OCRv6_medium_rec"
 ocr_output = "ignore/ocr_output"
 
 # RUN
-detection_result = dt.apply_detection(dt.YoloDetection(), yolo_model, image_path)
+detection_result = dt.apply_detection(dt.YoloDetection(), yolo_model, image_path, conf)
 
 image_roi = roi.apply_roi(roi.Crop, image_path, detection_result)
 

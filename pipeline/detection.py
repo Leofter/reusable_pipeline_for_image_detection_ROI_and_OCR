@@ -5,7 +5,7 @@ from ultralytics import YOLO
 class Detection(ABC):
 
     @abstractmethod
-    def model_result(self):
+    def model_result(self, model: str, image_path: str, conf: float):
         pass
 
 
@@ -27,5 +27,5 @@ class YoloDetection(Detection):
         return xyxy
 
 
-def apply_detection(detection: Detection, model: str, image: str):
-    return detection.model_result()
+def apply_detection(detection: Detection, model: str, image: str, conf: float):
+    return detection.model_result(model, image, conf)
