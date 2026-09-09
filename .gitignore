@@ -1,6 +1,9 @@
-.env 
 
+.env 
+.env
 ignore/*
 !ignore/.gitkeep
-
+__pycache__
+__pycache__/
+pipiline/__pycache__/
 .vscode

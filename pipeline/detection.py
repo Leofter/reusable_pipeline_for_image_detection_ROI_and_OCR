@@ -1,31 +1,35 @@
 from abc import ABC, abstractmethod, abstractclassmethod
+from numpy.typing import NDArray
+import numpy as np
 from ultralytics import YOLO
+
+BoundingBoxes = NDArray[np.float32]
 
 
 class Detection(ABC):
 
     @abstractmethod
-    def model_result(self, model: str, image_path: str, conf: float):
+    def predict(self, image_path: str, conf: float) -> BoundingBoxes:
         pass
 
 
 class YoloDetection(Detection):
 
-    def model_result(self, model: str, image_path: str, conf: float):
+    def __init__(self, model_path: str):
+        self.model = YOLO(model_path)
 
-        model = YOLO(model)
-
-        results = model.predict(
-            source=image_path,  # Path to your test or validation images
+    def predict(self, image_path: str, conf: float) -> BoundingBoxes:
+        results = self.model.predict(
+            source=image_path, 
             conf=conf,
         )
 
+        boxes = []
         for result in results:
-            xyxy = result.boxes.xyxy
-            # top-left-x, top-left-y, bottom-right-x, bottom-right-y
+            boxes.extend(result.boxes.xyxy.cpu().numpy())
 
-        return xyxy
+        return boxes
 
 
-def apply_detection(detection: Detection, model: str, image: str, conf: float):
-    return detection.model_result(model, image, conf)
+def apply_detection(detection: Detection, image: str, conf: float):
+    return detection.predict(image, conf)
