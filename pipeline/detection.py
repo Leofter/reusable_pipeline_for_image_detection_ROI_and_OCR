@@ -5,27 +5,27 @@ from ultralytics import YOLO
 class Detection(ABC):
 
     @abstractmethod
-    def model_result(self, model: str, image_path: str, conf: float):
+    def predict(self, image_path: str, conf: float):
         pass
 
 
 class YoloDetection(Detection):
 
-    def model_result(self, model: str, image_path: str, conf: float):
+    def __init__(self, model_path: str):
+        self.model = YOLO(model_path)
 
-        model = YOLO(model)
-
-        results = model.predict(
+    def predict(self, image_path: str, conf: float):
+        results = self.model.predict(
             source=image_path,  # Path to your test or validation images
             conf=conf,
         )
 
+        boxes = []
         for result in results:
-            xyxy = result.boxes.xyxy
-            # top-left-x, top-left-y, bottom-right-x, bottom-right-y
+            boxes.extend(result.boxes.xyxy.cpu().numpy())
 
-        return xyxy
+        return boxes
 
 
-def apply_detection(detection: Detection, model: str, image: str, conf: float):
-    return detection.model_result(model, image, conf)
+def apply_detection(detection: Detection, image: str, conf: float):
+    return detection.predict(image, conf)
