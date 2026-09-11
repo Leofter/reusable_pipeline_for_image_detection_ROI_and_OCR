@@ -7,3 +7,6 @@ __pycache__
 __pycache__/
 pipiline/__pycache__/
 .vscode
+mlflow_test
+mlflow.db
+mlruns

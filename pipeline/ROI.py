@@ -5,10 +5,6 @@ from .detection import *
 
 class Roi(ABC):
 
-    def __init__(self, image, xyxy):
-        self.image = image
-        self.xyxy = xyxy
-
     @abstractmethod
     def crop(self):
         pass
@@ -16,20 +12,23 @@ class Roi(ABC):
 
 class Crop(Roi):
 
-    def __init__(self, image, xyxy):
-        super().__init__(image, xyxy)
+    def __init__(self, image):
+        self.image = image
 
-    def crop(self):
-        image = cv2.imread(self.image)
+    def crop(self, xyxy):
 
-        for box in self.xyxy:
-            xyxy = box.astype(int)
-            xmin, ymin, xmax, ymax = xyxy
+        while True:
+            image = cv2.imread(self.image)
+            self.xyxy = xyxy
 
-            self.roi_image = image[ymin:ymax, xmin:xmax]
+            for box in self.xyxy:
+                xyxy = box.astype(int)
+                xmin, ymin, xmax, ymax = xyxy
+
+                self.roi_image = image[ymin:ymax, xmin:xmax]
 
             return self.roi_image
 
 
-def apply_roi(roi: Roi, image: str, xyxy):
-    return roi(image, xyxy).crop()
+def apply_roi(roi: Roi, xyxy):
+    return roi.crop(xyxy)
