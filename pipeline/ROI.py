@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod, abstractclassmethod
+from abc import ABC, abstractmethod
 import cv2
-from .detection import *
+import numpy as np
 
 
 class Roi(ABC):
@@ -15,19 +15,17 @@ class Crop(Roi):
     def __init__(self, image):
         self.image = image
 
-    def crop(self, xyxy):
+    def crop(self, detections):
+        roi_images = []
 
-        while True:
-            image = cv2.imread(self.image)
-            self.xyxy = xyxy
+        for image_path, boxes in detections:
+            image = cv2.imread(image_path)
 
-            for box in self.xyxy:
-                xyxy = box.astype(int)
-                xmin, ymin, xmax, ymax = xyxy
+            for box in boxes:
+                xmin, ymin, xmax, ymax = np.asarray(box, dtype=int)
+                roi_images.append(image[ymin:ymax, xmin:xmax])
 
-                self.roi_image = image[ymin:ymax, xmin:xmax]
-
-            return self.roi_image
+        return roi_images
 
 
 def apply_roi(roi: Roi, xyxy):
