@@ -12,3 +12,5 @@ ultralytics
 dotenv
 
 mlflow
+
+pathlib

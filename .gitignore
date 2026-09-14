@@ -10,3 +10,5 @@ pipiline/__pycache__/
 mlflow_test
 mlflow.db
 mlruns
+weights/
+runs/
