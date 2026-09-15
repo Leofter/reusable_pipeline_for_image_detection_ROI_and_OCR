@@ -30,10 +30,13 @@ def yolo_model_traning():
 
     os.environ["MLFLOW_TRACKING_URI"] = TRACKING_URI
     os.environ["MLFLOW_EXPERIMENT_NAME"] = EXPERIMENT_NAME
-    
+
     models_dir = Path("ignore/yolo_models")
 
     for model in models_dir.iterdir():
+
+        gc.collect()
+        torch.cuda.empty_cache()
 
         if not model.is_file() and model.suffix != ".pt":
             raise ValueError("Nao tem apenas modelos dentro da pasta")
@@ -64,8 +67,6 @@ def yolo_model_traning():
         print(f"Concluido o treino do modelo: {model.name}")
         del results
         del ymodel
-        gc.collect()
-        torch.cuda.empty_cache()
 
 
 def yolo_model_validation():
