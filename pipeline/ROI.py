@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 import cv2
 import numpy as np
+from numpy import ndarray
+from typing import List, Tuple
 
 
 class Roi(ABC):
@@ -13,10 +15,10 @@ class Roi(ABC):
 
 class Crop(Roi):
 
-    def __init__(self, image):
+    def __init__(self, image: str) -> None:
         self.image = image
 
-    def crop(self, detections):
+    def crop(self, detections: List[Tuple[str, ndarray]]) -> List[ndarray]:
         roi_images = []
 
         for image_path, boxes in detections:
@@ -29,5 +31,5 @@ class Crop(Roi):
         return roi_images
 
 
-def apply_roi(roi: Roi, xyxy):
+def apply_roi(roi: Roi, xyxy: List[Tuple[str, ndarray]]) -> List[ndarray]:
     return roi.crop(xyxy)

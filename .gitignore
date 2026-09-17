@@ -6,6 +6,7 @@ ignore/*
 __pycache__
 __pycache__/
 pipiline/__pycache__/
+monkeytype.sqlite3
 .vscode
 mlflow_test
 mlflow.db
