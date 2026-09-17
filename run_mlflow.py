@@ -1,5 +1,3 @@
-import mlflow
-from ultralytics import settings, YOLO
 from pipeline import MLflow as ml
 
 # TROCAR QUANDO FOR FAZER O SOLID
