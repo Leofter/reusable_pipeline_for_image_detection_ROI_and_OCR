@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod, abstractclassmethod
-import cv2
+from abc import ABC, abstractmethod
+
 from paddleocr import TextRecognition
 
 

@@ -1,9 +1,10 @@
-import os
-import mlflow
-from pathlib import Path
-from ultralytics import settings, YOLO
 import gc
+import os
+from pathlib import Path
+
+import mlflow
 import torch
+from ultralytics import YOLO, settings
 
 DEFAULT_TRACKING_URI = f"sqlite:///{Path('mlflow.db').resolve()}"
 TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", DEFAULT_TRACKING_URI)
