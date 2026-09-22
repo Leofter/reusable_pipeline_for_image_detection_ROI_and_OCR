@@ -70,34 +70,67 @@ def yolo_model_traning():
         del ymodel
 
 
-def yolo_model_validation():
+def yolo_model_val():
+
+    settings.reset()
+    settings.update({"mlflow": False})
 
     mlflow.set_tracking_uri(TRACKING_URI)
     mlflow.set_experiment(EXPERIMENT_NAME)
 
-    models_dir = Path("")
+    device = 0 if torch.cuda.is_available() else "cpu"
+    experiment = mlflow.get_experiment_by_name(EXPERIMENT_NAME)
 
-    for model in models_dir.iterdir():
-        if model.is_file() == False and model.suffix() != ".pt":
-            raise ValueError("Nao tem apenas modelos dentro da pasta")
-        else:
-            model_name = model.name
-            ymodel = YOLO(model)
-            with mlflow.start_run(run_name="exp1-validation"):
-                metrics = model.val(data="ignore/yaml/data.yaml", split="val")
-                mlflow.log_metrics(
-                    {
-                        "val_mAP50": metrics.box.map50,
-                        "val_mAP50_95": metrics.box.map,
-                        "val_precision": metrics.box.mp,
-                        "val_recall": metrics.box.mr,
-                    }
-                )
-                # sobe a matriz de confusão, curva PR, curva F1, etc. geradas pelo val()
-                mlflow.log_artifacts(str(metrics.save_dir), artifact_path="validation")
-                mlflow.set_tags(
-                    {
-                        "source_train_run": "exp1",
-                        "stage": "validation",
-                    }
-                )
+    runs_df = mlflow.search_runs(
+        experiment_ids=[experiment.experiment_id], filter_string="status = 'FINISHED'"
+    )
+
+    runs_df = runs_df[runs_df["tags.mlflow.runName"].str.endswith("-train", na=False)]
+
+    for run_id in runs_df["run_id"]:
+
+        gc.collect()
+        torch.cuda.empty_cache()
+
+        model_uri = f"runs:/{run_id}/weights/best.pt"
+
+        try:
+            local_model_path = mlflow.artifacts.download_artifacts(model_uri)
+            model = YOLO(local_model_path)
+        except Exception as error:
+            raise RuntimeError(f"ERRO ao carregar modelo:{run_id} no YOLO()") from error
+
+        with mlflow.start_run(run_id=run_id):
+            print(f"\n\n\nAvaliando o modelo da Run ID: {run_id}\n\n\n")
+
+            results = model.val(
+                data="ignore/yaml/data.yaml",
+                split="test",
+                device=device,
+                project="ignore/eval_models",
+                name=f"eval_{run_id}",
+            )
+
+            metrics = {
+                f"test/{key}": float(value)
+                for key, value in results.results_dict.items()
+            }
+
+            metrics.update(
+                {
+                    f"test/speed_{process_name}_ms": float(results.speed[process_name])
+                    for process_name in ("preprocess", "inference", "postprocess")
+                    if process_name in results.speed
+                }
+            )
+
+            mlflow.log_metrics(metrics)
+
+            eval_dir = Path("ignore/eval_models") / f"eval_{run_id}"
+
+            if eval_dir.exists():
+                mlflow.log_artifacts(str(eval_dir), artifact_path="test")
+
+    print(f"Concluído: {run_id}")
+    del results
+    del model
