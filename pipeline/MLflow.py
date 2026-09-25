@@ -1,5 +1,6 @@
 import gc
 import os
+import re
 from pathlib import Path
 
 import mlflow
@@ -11,6 +12,10 @@ TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", DEFAULT_TRACKING_URI)
 EXPERIMENT_NAME = os.getenv(
     "MLFLOW_EXPERIMENT_NAME", "POC_yolo_models_for_boudingbox_detection"
 )
+
+
+def _sanitize_metric_name(name: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9_./: -]", "_", name)
 
 
 def reset_yolo_settings():
@@ -112,7 +117,7 @@ def yolo_model_val():
             )
 
             metrics = {
-                f"test/{key}": float(value)
+                _sanitize_metric_name(f"test/{key}"): float(value)
                 for key, value in results.results_dict.items()
             }
 
