@@ -1,0 +1,19 @@
+path: /home/projetos/reusable_pipeline_for_image_detection_ROI_and_OCR
+
+train:
+  - dataset/train/images
+  - dataset_2/train/images
+
+val:
+  - dataset/val/images
+  - dataset_2/val/images
+
+test: 
+  - dataset/test/images
+  - dataset_2/test/images
+
+#Quantidade de labels
+nc: 3
+
+#nome das labels em ordem
+names: ["label_1", "label_2", "label_3"]

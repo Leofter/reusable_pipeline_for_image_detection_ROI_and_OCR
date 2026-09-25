@@ -1,13 +1,12 @@
-from abc import ABC, abstractmethod, abstractclassmethod
+from abc import ABC, abstractmethod
+
 import cv2
-from .detection import *
+import numpy as np
+from numpy import ndarray
+from typing import List, Tuple
 
 
 class Roi(ABC):
-
-    def __init__(self, image, xyxy):
-        self.image = image
-        self.xyxy = xyxy
 
     @abstractmethod
     def crop(self):
@@ -16,20 +15,21 @@ class Roi(ABC):
 
 class Crop(Roi):
 
-    def __init__(self, image, xyxy):
-        super().__init__(image, xyxy)
+    def __init__(self, image: str) -> None:
+        self.image = image
 
-    def crop(self):
-        image = cv2.imread(self.image)
+    def crop(self, detections: List[Tuple[str, ndarray]]) -> List[ndarray]:
+        roi_images = []
 
-        for box in self.xyxy:
-            xyxy = box.astype(int)
-            xmin, ymin, xmax, ymax = xyxy
+        for image_path, boxes in detections:
+            image = cv2.imread(image_path)
 
-            self.roi_image = image[ymin:ymax, xmin:xmax]
+            for box in boxes:
+                xmin, ymin, xmax, ymax = np.asarray(box, dtype=int)
+                roi_images.append(image[ymin:ymax, xmin:xmax])
 
-            return self.roi_image
+        return roi_images
 
 
-def apply_roi(roi: Roi, image: str, xyxy):
-    return roi(image, xyxy).crop()
+def apply_roi(roi: Roi, xyxy: List[Tuple[str, ndarray]]) -> List[ndarray]:
+    return roi.crop(xyxy)

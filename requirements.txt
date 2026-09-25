@@ -10,3 +10,7 @@ torch
 ultralytics
 
 dotenv
+
+mlflow
+
+pathlib
